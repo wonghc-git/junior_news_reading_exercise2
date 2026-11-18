@@ -1,0 +1,1333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Junior News Reading Exercise</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: #0f172a;
+  -webkit-overflow-scrolling: touch;
+}
+/* Custom subtle scrollbar styling */
+.custom-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+.custom-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scroll::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.25);
+  border-radius: 9999px;
+}
+/* Custom subtle animations for slide & fade transitions */
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(22px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-22px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes fadeInScale {
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1); }
+}
+.anim-right {
+  animation: slideInRight 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.anim-left {
+  animation: slideInLeft 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.anim-fade {
+  animation: fadeInScale 0.18s ease-out forwards;
+}
+.glossary-word {
+  border-bottom: 1.5px dashed currentColor;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0 2px;
+  border-radius: 3px;
+  background-color: rgba(255, 255, 255, 0.7);
+  transition: all 0.15s ease;
+}
+.glossary-word:active, .glossary-word.active-word {
+  background-color: #1e293b;
+  color: #ffffff !important;
+  border-bottom-color: transparent;
+}
+
+/* ==========================================================================
+   FLEXIBLE & ADJUSTABLE DEVICE VIEWPORT SYSTEM (Phone / Tablet / Auto Fit)
+   ========================================================================== */
+#appFrame {
+  transition: width 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+              max-width 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+              height 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+              border-radius 0.25s ease;
+}
+
+/* 1. PHONE MODE (Compact Stacked Layout ~412px) */
+#appFrame[data-view="phone"] {
+  width: 100%;
+  max-width: 412px;
+  height: 100dvh;
+  max-height: 840px;
+}
+@media (min-width: 640px) {
+  #appFrame[data-view="phone"] {
+    height: calc(100dvh - 56px);
+    border-radius: 1.75rem;
+    border-width: 5px;
+    border-color: #1e293b;
+  }
+}
+#appFrame[data-view="phone"] #mainContentWrapper {
+  flex-direction: column;
+}
+#appFrame[data-view="phone"] #topHalf {
+  height: 46%;
+  min-height: 225px;
+  width: 100%;
+  border-bottom-width: 2px;
+  border-right-width: 0px;
+}
+#appFrame[data-view="phone"] #bottomHalf {
+  height: 54%;
+  min-height: 265px;
+  width: 100%;
+}
+
+/* 2. TABLET PORTRAIT MODE (Spacious Stacked + 2-Col Options ~768px) */
+#appFrame[data-view="tablet-portrait"] {
+  width: 100%;
+  max-width: 768px;
+  height: 100dvh;
+  max-height: 980px;
+}
+@media (min-width: 640px) {
+  #appFrame[data-view="tablet-portrait"] {
+    height: calc(100dvh - 56px);
+    border-radius: 2rem;
+    border-width: 6px;
+    border-color: #1e293b;
+  }
+}
+#appFrame[data-view="tablet-portrait"] #mainContentWrapper {
+  flex-direction: column;
+}
+#appFrame[data-view="tablet-portrait"] #topHalf {
+  height: 47%;
+  min-height: 270px;
+  width: 100%;
+  border-bottom-width: 2px;
+  border-right-width: 0px;
+}
+#appFrame[data-view="tablet-portrait"] #bottomHalf {
+  height: 53%;
+  min-height: 300px;
+  width: 100%;
+}
+
+/* 3. TABLET LANDSCAPE MODE (Side-by-Side Split View ~1040px) */
+#appFrame[data-view="tablet-landscape"] {
+  width: 100%;
+  max-width: 1060px;
+  height: 100dvh;
+  max-height: 760px;
+}
+@media (min-width: 640px) {
+  #appFrame[data-view="tablet-landscape"] {
+    height: calc(100dvh - 56px);
+    border-radius: 2rem;
+    border-width: 6px;
+    border-color: #1e293b;
+  }
+}
+#appFrame[data-view="tablet-landscape"] #mainContentWrapper {
+  flex-direction: row;
+}
+#appFrame[data-view="tablet-landscape"] #topHalf {
+  height: 100%;
+  width: 48%;
+  min-height: 0;
+  border-bottom-width: 0px;
+  border-right-width: 2px;
+}
+#appFrame[data-view="tablet-landscape"] #bottomHalf {
+  height: 100%;
+  width: 52%;
+  min-height: 0;
+}
+
+/* Tablet Typography & Spacing Enhancements (Portrait & Landscape) */
+#appFrame[data-view="tablet-portrait"] #topHeader,
+#appFrame[data-view="tablet-landscape"] #topHeader {
+  padding: 0.5rem 1rem;
+}
+#appFrame[data-view="tablet-portrait"] #headerTitleText,
+#appFrame[data-view="tablet-landscape"] #headerTitleText {
+  font-size: 0.95rem;
+}
+#appFrame[data-view="tablet-portrait"] #articleContainer,
+#appFrame[data-view="tablet-landscape"] #articleContainer {
+  padding: 0.75rem 1.25rem;
+}
+#appFrame[data-view="tablet-portrait"] #articleEmoji,
+#appFrame[data-view="tablet-landscape"] #articleEmoji {
+  width: 2.25rem;
+  height: 2.25rem;
+  font-size: 1.2rem;
+}
+#appFrame[data-view="tablet-portrait"] #articleTitle,
+#appFrame[data-view="tablet-landscape"] #articleTitle {
+  font-size: 1.15rem;
+}
+#appFrame[data-view="tablet-portrait"] #articleCategory,
+#appFrame[data-view="tablet-landscape"] #articleCategory {
+  font-size: 0.68rem;
+  padding: 0.2rem 0.6rem;
+}
+#appFrame[data-view="tablet-portrait"] #articleByline,
+#appFrame[data-view="tablet-landscape"] #articleByline,
+#appFrame[data-view="tablet-portrait"] #storySwipeHint,
+#appFrame[data-view="tablet-landscape"] #storySwipeHint {
+  font-size: 0.74rem;
+}
+#appFrame[data-view="tablet-portrait"] #articleText,
+#appFrame[data-view="tablet-landscape"] #articleText {
+  font-size: 0.95rem;
+  line-height: 1.58;
+  margin-top: 0.35rem;
+  margin-bottom: 0.35rem;
+}
+#appFrame[data-view="tablet-portrait"] #articleText p + p,
+#appFrame[data-view="tablet-landscape"] #articleText p + p {
+  margin-top: 0.55rem;
+}
+#appFrame[data-view="tablet-portrait"] #glossaryBar,
+#appFrame[data-view="tablet-landscape"] #glossaryBar {
+  padding: 0.45rem 0.75rem;
+  min-height: 2.25rem;
+}
+#appFrame[data-view="tablet-portrait"] #glossaryBadge,
+#appFrame[data-view="tablet-landscape"] #glossaryBadge {
+  font-size: 0.68rem;
+  padding: 0.2rem 0.5rem;
+}
+#appFrame[data-view="tablet-portrait"] #glossaryContent,
+#appFrame[data-view="tablet-landscape"] #glossaryContent {
+  font-size: 0.84rem;
+}
+#appFrame[data-view="tablet-portrait"] #bottomHalf,
+#appFrame[data-view="tablet-landscape"] #bottomHalf {
+  padding: 0.75rem 1.25rem;
+}
+#appFrame[data-view="tablet-portrait"] #questionText,
+#appFrame[data-view="tablet-landscape"] #questionText {
+  font-size: 1.02rem;
+  line-height: 1.4;
+  margin-bottom: 0.25rem;
+}
+#appFrame[data-view="tablet-portrait"] #optionsList {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+#appFrame[data-view="tablet-landscape"] #optionsList {
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+#appFrame[data-view="tablet-portrait"] .option-btn,
+#appFrame[data-view="tablet-landscape"] .option-btn {
+  padding: 0.55rem 0.8rem;
+  font-size: 0.88rem;
+  line-height: 1.35;
+  border-radius: 0.65rem;
+}
+#appFrame[data-view="tablet-portrait"] .option-badge,
+#appFrame[data-view="tablet-landscape"] .option-badge {
+  width: 1.4rem;
+  height: 1.4rem;
+  font-size: 0.75rem;
+}
+#appFrame[data-view="tablet-portrait"] .q-tab-btn,
+#appFrame[data-view="tablet-landscape"] .q-tab-btn {
+  padding: 0.25rem 0.65rem;
+  font-size: 0.78rem;
+}
+#appFrame[data-view="tablet-portrait"] #questionSkillTag,
+#appFrame[data-view="tablet-landscape"] #questionSkillTag,
+#appFrame[data-view="tablet-portrait"] #summaryToggleBtn,
+#appFrame[data-view="tablet-landscape"] #summaryToggleBtn {
+  font-size: 0.74rem;
+  padding: 0.22rem 0.55rem;
+}
+#appFrame[data-view="tablet-portrait"] #prevQBtn,
+#appFrame[data-view="tablet-landscape"] #prevQBtn,
+#appFrame[data-view="tablet-portrait"] #nextQBtn,
+#appFrame[data-view="tablet-landscape"] #nextQBtn {
+  font-size: 0.8rem;
+  padding: 0.4rem 0.75rem;
+}
+#appFrame[data-view="tablet-portrait"] #submitQuizBtn,
+#appFrame[data-view="tablet-landscape"] #submitQuizBtn {
+  font-size: 0.85rem;
+  padding: 0.45rem 0.85rem;
+}
+</style>
+</head>
+<body class="flex flex-col items-center justify-start sm:justify-center w-full min-h-[100dvh] bg-slate-900 sm:p-2 gap-1.5">
+
+<!-- ================= FLEXIBLE DEVICE & VIEWPORT SWITCHER BAR ================= -->
+<div id="deviceToolbar" class="w-full max-w-[1060px] px-2.5 py-1 bg-slate-800/90 backdrop-blur-md text-slate-200 sm:rounded-full border-b sm:border border-slate-700/80 flex items-center justify-between gap-2 text-[11px] shrink-0 z-30 shadow-md">
+  <div class="flex items-center gap-1.5 min-w-0">
+    <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
+    <span class="font-bold text-slate-300 truncate hidden xs:inline sm:inline">Display Size:</span>
+    <span id="activeSizeLabel" class="text-[10px] font-semibold text-sky-300 bg-slate-900/80 px-2 py-0.5 rounded-full border border-slate-700 truncate">Auto Fit</span>
+  </div>
+  <div class="flex items-center gap-1 shrink-0" role="group" aria-label="Device Viewport Presets">
+    <button type="button" onclick="setViewportMode('auto')" id="modeBtn-auto" class="mode-btn px-2 py-0.5 rounded-full font-bold text-[10.5px] transition flex items-center gap-1 bg-sky-600 text-white shadow-xs">
+      <span>✨</span><span>Auto</span>
+    </button>
+    <button type="button" onclick="setViewportMode('phone')" id="modeBtn-phone" class="mode-btn px-2 py-0.5 rounded-full font-bold text-[10.5px] transition flex items-center gap-1 text-slate-300 hover:bg-slate-700/70">
+      <span>📱</span><span>Phone</span>
+    </button>
+    <button type="button" onclick="setViewportMode('tablet-portrait')" id="modeBtn-tablet-portrait" class="mode-btn px-2 py-0.5 rounded-full font-bold text-[10.5px] transition flex items-center gap-1 text-slate-300 hover:bg-slate-700/70">
+      <span>📟</span><span class="hidden md:inline">Tablet</span><span>Portrait</span>
+    </button>
+    <button type="button" onclick="setViewportMode('tablet-landscape')" id="modeBtn-tablet-landscape" class="mode-btn px-2 py-0.5 rounded-full font-bold text-[10.5px] transition flex items-center gap-1 text-slate-300 hover:bg-slate-700/70">
+      <span>💻</span><span class="hidden md:inline">Tablet</span><span>Split</span>
+    </button>
+  </div>
+</div>
+
+<!-- Adjustable Mobile / Tablet App Viewport Frame -->
+<div id="appFrame" data-view="phone" class="relative bg-white sm:shadow-2xl flex flex-col overflow-hidden transition-colors duration-300">
+  <!-- Top Navigation Bar (Spans full width of phone or tablet) -->
+  <header id="topHeader" class="px-2.5 py-1.5 text-white flex items-center justify-between shrink-0 shadow-sm transition-colors duration-300 z-10">
+    <button id="prevArticleBtn" onclick="changeArticle(-1)" aria-label="Previous Story" class="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-white/20 hover:bg-white/30 active:scale-95 flex items-center justify-center transition">
+      <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+    </button>
+    <div class="flex items-center gap-2">
+      <span id="headerTitleText" class="text-xs font-extrabold tracking-tight">Junior News Reading Exercise</span>
+      <!-- Story Progress Dots inline to save vertical space -->
+      <div id="articleDots" class="flex items-center gap-1"></div>
+    </div>
+    <button id="nextArticleBtn" onclick="changeArticle(1)" aria-label="Next Story" class="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-white/20 hover:bg-white/30 active:scale-95 flex items-center justify-center transition">
+      <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+    </button>
+  </header>
+
+  <!-- Responsive Content Wrapper: Stacked on Phone/Tablet-Portrait, Side-by-Side on Tablet-Landscape -->
+  <div id="mainContentWrapper" class="flex-1 flex flex-col min-h-0 w-full overflow-hidden">
+    <!-- ================= ARTICLE SECTION (Top on Phone/Portrait, Left on Landscape) ================= -->
+    <section id="topHalf" class="h-[46%] min-h-[225px] w-full flex flex-col justify-between border-b-2 relative overflow-hidden select-none transition-colors duration-300 shrink-0">
+      <!-- Article Header, Scrollable Body & Compact Glossary Bar -->
+      <div id="articleContainer" class="flex-1 px-3 py-1 flex flex-col justify-between min-h-0 overflow-hidden">
+        <!-- Compact Category Badge, Icon & Title Row -->
+        <div class="shrink-0 mb-0.5">
+          <div class="flex items-center justify-between gap-1.5">
+            <div class="flex items-center gap-1.5 min-w-0">
+              <div id="articleEmoji" class="w-6 h-6 rounded-lg border flex items-center justify-center text-sm shrink-0 bg-white/85"></div>
+              <h1 id="articleTitle" class="text-[13px] font-extrabold text-slate-800 leading-tight truncate"></h1>
+            </div>
+            <span id="articleCategory" class="inline-flex items-center text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full border shrink-0"></span>
+          </div>
+          <div class="flex items-center justify-between mt-0.5">
+            <p id="articleByline" class="text-[9.5px] text-slate-600 truncate font-medium"></p>
+            <span id="storySwipeHint" class="text-[9px] font-semibold flex items-center gap-0.5 opacity-75 shrink-0">
+              ↔ Swipe story
+            </span>
+          </div>
+        </div>
+        <!-- Scrollable Article Paragraphs -->
+        <div id="articleText" class="custom-scroll flex-1 overflow-y-auto pr-1 text-[11.8px] leading-[1.32] text-slate-800 space-y-1 my-0.5"></div>
+        <!-- Compact Interactive Glossary Bar -->
+        <div id="glossaryBar" class="shrink-0 bg-white/90 border rounded-lg px-2 py-1 flex items-center justify-between gap-1.5 min-h-[24px]">
+          <div class="flex items-center gap-1.5 min-w-0 flex-1">
+            <span id="glossaryBadge" class="text-[8.5px] font-extrabold uppercase tracking-wider text-white px-1.5 py-0.5 rounded shrink-0">Word</span>
+            <p id="glossaryContent" class="text-[10.5px] text-slate-700 truncate font-medium">
+              Tap a <span class="font-bold underline decoration-dashed">highlighted word</span> for its meaning!
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= QUIZ & REVIEW SECTION (Bottom on Phone/Portrait, Right on Landscape) ================= -->
+    <section id="bottomHalf" class="h-[54%] min-h-[265px] flex-1 w-full flex flex-col justify-between px-3 py-1.5 relative overflow-hidden select-none transition-colors duration-300">
+      <!-- Compact Top Row of Bottom Half: Question Tabs (Q1-Q4) & Skill/Score Indicator -->
+      <div class="flex items-center justify-between gap-1 shrink-0 pb-1 border-b border-black/5">
+        <!-- Interactive Q1 - Q4 Pill Tabs -->
+        <div id="questionTabs" class="flex items-center gap-1"></div>
+        <!-- Skill Badge OR Score Badge after submission -->
+        <div class="flex items-center gap-1">
+          <span id="questionSkillTag" class="text-[9.5px] font-bold px-1.5 py-0.5 rounded border"></span>
+          <button id="summaryToggleBtn" onclick="toggleSummaryModal()" class="hidden text-[9.5px] font-extrabold px-2 py-0.5 rounded bg-slate-800 text-white hover:bg-slate-700 active:scale-95 transition">
+            All 4 Key
+          </button>
+        </div>
+      </div>
+      <!-- Scrollable Question & Options Container -->
+      <div id="questionSwipeArea" class="custom-scroll flex-1 overflow-y-auto pr-0.5 py-1 flex flex-col justify-start gap-1.5 min-h-0">
+        <!-- Question Prompt -->
+        <div id="questionCard" class="shrink-0">
+          <h2 id="questionText" class="text-[12.2px] sm:text-[12.8px] font-bold text-slate-800 leading-[1.28]"></h2>
+        </div>
+        <!-- 4 Multiple Choice Options -->
+        <div id="optionsList" class="grid grid-cols-1 gap-1 shrink-0"></div>
+      </div>
+      <!-- Pinned Bottom Action Bar: Prev/Next Question + Submit Answers Button -->
+      <div class="flex items-center justify-between gap-1.5 pt-1 shrink-0 border-t border-black/10 bg-inherit z-10">
+        <button id="prevQBtn" onclick="changeQuestion(-1)" class="px-2 py-1 rounded-lg bg-white/90 hover:bg-white border border-slate-300/90 text-slate-700 font-bold text-[10.5px] flex items-center gap-0.5 active:scale-95 transition disabled:opacity-35 disabled:pointer-events-none shrink-0">
+          <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+          Prev
+        </button>
+        <!-- Dynamic Center Action Button: Submit Answers OR Post-Submit Status -->
+        <div class="flex-1 flex items-center justify-center min-w-0">
+          <button id="submitQuizBtn" onclick="submitCurrentStory()" disabled class="w-full py-1 px-2.5 rounded-lg font-extrabold text-[11px] tracking-tight shadow-sm transition-all flex items-center justify-center gap-1 disabled:bg-slate-200 disabled:text-slate-400 disabled:border disabled:border-slate-300/80 disabled:shadow-none active:scale-95 truncate">
+            <span>Answer all 4 (0/4)</span>
+          </button>
+        </div>
+        <button id="nextQBtn" onclick="changeQuestion(1)" class="px-2 py-1 rounded-lg bg-white/90 hover:bg-white border border-slate-300/90 text-slate-700 font-bold text-[10.5px] flex items-center gap-0.5 active:scale-95 transition disabled:opacity-35 disabled:pointer-events-none shrink-0">
+          Next
+          <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+
+      <!-- COMPACT OVERLAY MODAL: All 4 Correct Answers Overview -->
+      <div id="summaryOverlay" class="hidden absolute inset-0 bg-white/95 backdrop-blur-xs z-20 px-3 py-2 flex-col justify-between anim-fade overflow-hidden">
+        <div class="flex items-center justify-between border-b border-slate-200 pb-1 shrink-0">
+          <div>
+            <h3 id="overlayScoreTitle" class="text-[11.5px] font-extrabold text-slate-800">Answer Key Summary</h3>
+            <p class="text-[9.5px] text-slate-500">Tap any question to inspect it</p>
+          </div>
+          <div class="flex items-center gap-1">
+            <button onclick="retryArticle()" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-[10px] transition">
+              Retry
+            </button>
+            <button onclick="toggleSummaryModal(false)" class="px-2 py-0.5 rounded bg-slate-800 text-white font-bold text-[10px] transition">
+              Close
+            </button>
+          </div>
+        </div>
+        <div id="overlayList" class="custom-scroll flex-1 overflow-y-auto grid grid-cols-1 gap-1 my-1 pr-0.5"></div>
+        <div class="flex items-center justify-between pt-1 border-t border-slate-200 shrink-0">
+          <span class="text-[9.5px] text-slate-400 font-semibold">Swipe story area for next story</span>
+          <button onclick="changeArticle(1)" class="px-2.5 py-1 rounded-lg bg-indigo-600 text-white font-bold text-[10.5px] flex items-center gap-1">
+            Next Story →
+          </button>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+// ============================================================================
+// ARTICLE & QUIZ DATA (5 Simplified News Articles for HK Primary 5 ESL Students)
+// ============================================================================
+const articles = [
+  {
+    id: 1,
+    category: "COVER FEATURE • STORY 01",
+    title: "Battling the Beyblade Trend",
+    byline: "Reported by: Goodies Staff Reporter",
+    emoji: "🪀",
+    theme: {
+      topBg: "#dcfce7", // Soft Mint / Emerald Green
+      bottomBg: "#f0fdf4", // Lighter Mint tint
+      borderColor: "#bbf7d0",
+      headerGrad: "linear-gradient(90deg, #059669 0%, #0d9488 100%)",
+      accentHex: "#059669",
+      badgeBg: "#bbf7d0",
+      badgeText: "#065f46",
+      wordColor: "#065f46"
+    },
+    paragraphs: [
+      "In 2026, children and adults are <span class='glossary-word' data-word='obsessed'>obsessed</span> with Beyblades. These spinning top toys first became popular in Hong Kong in the early 2000s when the Beyblade anime was shown on TV.",
+      "Today, kids love having Beyblade battles in shopping malls and parks because it is exciting and <span class='glossary-word' data-word='convenient'>convenient</span>. Playing together also helps adults remember their happy childhood days.",
+      "However, like many <span class='glossary-word' data-word='trends'>trends</span>, people may soon lose interest. Forgotten plastic toys often end up in <span class='glossary-word' data-word='landfills'>landfills</span>. Having fun with friends is great, but before asking your parents for the newest Beyblade, ask yourself, 'Do I really need it?'"
+    ],
+    glossary: {
+      obsessed: "Thinking about something all the time.",
+      convenient: "Easy and quick to do.",
+      trends: "Things that are popular right now.",
+      landfills: "Places where rubbish is buried."
+    },
+    questions: [
+      {
+        skill: "Reading Check",
+        q: "What kind of toy is a Beyblade?",
+        options: [
+          "A spinning top toy",
+          "A card game",
+          "A video game console",
+          "A remote control car"
+        ],
+        correct: 0
+      },
+      {
+        skill: "Reading Check",
+        q: "When did Beyblades first become popular in Hong Kong?",
+        options: [
+          "In the 1980s",
+          "In the early 2000s",
+          "In 2020",
+          "Last month"
+        ],
+        correct: 1
+      },
+      {
+        skill: "Reading Check",
+        q: "What often happens to plastic toys when people lose interest in them?",
+        options: [
+          "They turn into new TV shows.",
+          "They are thrown away in landfills.",
+          "They become more expensive for everyone.",
+          "They are kept in shopping malls forever."
+        ],
+        correct: 1
+      },
+      {
+        skill: "Reading Check",
+        q: "What should you ask yourself before buying the newest Beyblade?",
+        options: [
+          "\"Where is the nearest park?\"",
+          "\"Who is the best player in school?\"",
+          "\"Do I really need it?\"",
+          "\"What time is the anime on TV?\""
+        ],
+        correct: 2
+      }
+    ]
+  },
+  {
+    id: 2,
+    category: "GOODIES NEWS • STORY 02",
+    title: "Hong Kong Breaks Temperature Records",
+    byline: "Reported by: Goodies Weather Desk",
+    emoji: "🌡️",
+    theme: {
+      topBg: "#fef3c7", // Soft Warm Amber / Buttercup Yellow
+      bottomBg: "#fffbeb", // Lighter Warm Cream tint
+      borderColor: "#fde68a",
+      headerGrad: "linear-gradient(90deg, #d97706 0%, #ea580c 100%)",
+      accentHex: "#d97706",
+      badgeBg: "#fde68a",
+      badgeText: "#92400e",
+      wordColor: "#92400e"
+    },
+    paragraphs: [
+      "Even though the weather is getting cooler this month, <span class='glossary-word' data-word='meteorologists'>meteorologists</span> at the Hong Kong Observatory (HKO) reported many <span class='glossary-word' data-word='record-breaking'>record-breaking</span> hot days this year.",
+      "On 9 August, Hong Kong had its hottest day at 36.9 degrees Celsius because of hot air from a typhoon. Last month was also the warmest October ever! The average <span class='glossary-word' data-word='maximum'>maximum</span> temperature reached 30.5 degrees Celsius.",
+      "Scientists say this hot weather is caused by a <span class='glossary-word' data-word='combination'>combination</span> of climate change and El Niño. El Niño is a big weather pattern that makes Hong Kong warmer and brings stronger storms."
+    ],
+    glossary: {
+      meteorologists: "Scientists who study the weather.",
+      "record-breaking": "Higher or better than ever before.",
+      maximum: "The highest amount possible.",
+      combination: "Two or more things joined together."
+    },
+    questions: [
+      {
+        skill: "Reading Check",
+        q: "What was the temperature on Hong Kong's hottest day on 9 August?",
+        options: [
+          "25.0 degrees Celsius",
+          "30.5 degrees Celsius",
+          "36.9 degrees Celsius",
+          "40.2 degrees Celsius"
+        ],
+        correct: 2
+      },
+      {
+        skill: "Reading Check",
+        q: "Which month was the warmest ever recorded in Hong Kong?",
+        options: [
+          "June",
+          "August",
+          "October",
+          "November"
+        ],
+        correct: 2
+      },
+      {
+        skill: "Reading Check",
+        q: "What two things caused the warm weather in October?",
+        options: [
+          "Heavy snow and strong wind",
+          "Climate change and El Niño",
+          "Cool air and winter rain",
+          "Too many cars and taxis"
+        ],
+        correct: 1
+      },
+      {
+        skill: "Reading Check",
+        q: "What is El Niño?",
+        options: [
+          "A weather scientist at the HKO",
+          "A big weather pattern that makes weather warmer",
+          "A new taxi in Hong Kong",
+          "A cold winter storm"
+        ],
+        correct: 1
+      }
+    ]
+  },
+  {
+    id: 3,
+    category: "HONG KONG WONDERS • STORY 03",
+    title: "Tai O Fishing Village",
+    byline: "Reported by: Natasha Ng",
+    emoji: "🛶",
+    theme: {
+      topBg: "#e0f2fe", // Soft Sky Blue
+      bottomBg: "#f0f9ff", // Lighter Sky tint
+      borderColor: "#bae6fd",
+      headerGrad: "linear-gradient(90deg, #0284c7 0%, #2563eb 100%)",
+      accentHex: "#0284c7",
+      badgeBg: "#bae6fd",
+      badgeText: "#0369a1",
+      wordColor: "#0369a1"
+    },
+    paragraphs: [
+      "Have you ever wanted to live in a house on top of water? Tai O Village on Lantau Island is a special place in Hong Kong with no <span class='glossary-word' data-word='skyscrapers'>skyscrapers</span>.",
+      "It is home to one of Hong Kong's oldest <span class='glossary-word' data-word='communities'>communities</span>, the Tanka people. They have fished in colourful boats for a long time, so Tai O is sometimes called the 'Venice of the East'.",
+      "The Tanka people live in <span class='glossary-word' data-word='stilt'>stilt</span> houses called 'pang uk'. Large wooden poles hold the houses above the sea to keep them dry. Today, <span class='glossary-word' data-word='visitors'>visitors</span> can take a boat ride and eat giant fish balls!"
+    ],
+    glossary: {
+      skyscrapers: "Very tall city buildings.",
+      communities: "Groups of people living in the same place.",
+      stilt: "Long wooden poles holding a building up above water.",
+      visitors: "People who travel to see a place."
+    },
+    questions: [
+      {
+        skill: "Reading Check",
+        q: "Where is Tai O Village located?",
+        options: [
+          "On Lantau Island",
+          "In Kowloon",
+          "On Hong Kong Island",
+          "In Sai Kung"
+        ],
+        correct: 0
+      },
+      {
+        skill: "Reading Check",
+        q: "How have the Tanka people made their living for a long time?",
+        options: [
+          "By building tall skyscrapers",
+          "By fishing",
+          "By selling wooden poles",
+          "By driving buses"
+        ],
+        correct: 1
+      },
+      {
+        skill: "Reading Check",
+        q: "Why do Tanka people build their 'pang uk' houses on large wooden poles?",
+        options: [
+          "To make them taller than city buildings",
+          "To keep the houses dry when the water rises",
+          "To catch more fish inside the house",
+          "To paint the boats colourful"
+        ],
+        correct: 1
+      },
+      {
+        skill: "Reading Check",
+        q: "Which famous street food is a must-try in Tai O Village?",
+        options: [
+          "Pineapple buns",
+          "Egg tarts",
+          "Giant fish balls",
+          "Mango pudding"
+        ],
+        correct: 2
+      }
+    ]
+  },
+  {
+    id: 4,
+    category: "ECO ZONE • STORY 04",
+    title: "The Strange Platypus",
+    byline: "Reported by: Frances Law",
+    emoji: "🦆",
+    theme: {
+      topBg: "#f3e8ff", // Soft Lavender Purple
+      bottomBg: "#faf5ff", // Lighter Lavender tint
+      borderColor: "#e9d5ff",
+      headerGrad: "linear-gradient(90deg, #7e22ce 0%, #6d28d9 100%)",
+      accentHex: "#7e22ce",
+      badgeBg: "#e9d5ff",
+      badgeText: "#6b21a8",
+      wordColor: "#6b21a8"
+    },
+    paragraphs: [
+      "The platypus is one of the strangest animals on Earth. It lives in Eastern Australia and looks like a duck with a beaver's tail. Although it is a <span class='glossary-word' data-word='mammal'>mammal</span>, it lays eggs! Baby platypuses are called puggles. Another special <span class='glossary-word' data-word='trait'>trait</span> is that its body glows under UV light.",
+      "Platypuses hunt underwater with their eyes closed. They find insects, worms, and <span class='glossary-word' data-word='crustaceans'>crustaceans</span> by sensing their movements. Adult platypuses have no teeth! They use special jaw pads to <span class='glossary-word' data-word='grind'>grind</span> their food before swallowing.",
+      "When scientists first saw a platypus, they thought it was fake until they found its eggs in 1885!"
+    ],
+    glossary: {
+      mammal: "A warm-blooded animal that feeds milk to its babies.",
+      trait: "A special feature of a person or animal.",
+      crustaceans: "Water animals with hard shells, like shrimp and crabs.",
+      grind: "To crush something into tiny pieces."
+    },
+    questions: [
+      {
+        skill: "Reading Check",
+        q: "Why is the platypus different from most other mammals?",
+        options: [
+          "It can fly high in the sky.",
+          "It lays eggs.",
+          "It lives in the hot desert.",
+          "It only eats green leaves."
+        ],
+        correct: 1
+      },
+      {
+        skill: "Reading Check",
+        q: "What are baby platypuses called?",
+        options: [
+          "Ducklings",
+          "Puppies",
+          "Puggles",
+          "Kittens"
+        ],
+        correct: 2
+      },
+      {
+        skill: "Reading Check",
+        q: "How do adult platypuses chew their food without teeth?",
+        options: [
+          "They use special jaw pads to grind their food.",
+          "They ask other animals to chew it.",
+          "They cook their food on rocks.",
+          "They only drink water."
+        ],
+        correct: 0
+      },
+      {
+        skill: "Reading Check",
+        q: "What did early scientists think when they first saw a platypus?",
+        options: [
+          "They thought it was a normal duck.",
+          "They thought it was not a real animal.",
+          "They wanted to keep it as a house pet.",
+          "They thought it lived in Hong Kong."
+        ],
+        correct: 1
+      }
+    ]
+  },
+  {
+    id: 5,
+    category: "AI GALAXY • STORY 05",
+    title: "Can AI Be an Artist?",
+    byline: "Reported by: Ms Yee",
+    emoji: "🎨",
+    theme: {
+      topBg: "#ffe4e6", // Soft Rose / Coral Pink
+      bottomBg: "#fff1f2", // Lighter Rose tint
+      borderColor: "#fecdd3",
+      headerGrad: "linear-gradient(90deg, #e11d48 0%, #db2777 100%)",
+      accentHex: "#e11d48",
+      badgeBg: "#fecdd3",
+      badgeText: "#9f1239",
+      wordColor: "#9f1239"
+    },
+    paragraphs: [
+      "Imagine asking a computer to draw a dragon reading a book on the moon. Within seconds, AI image <span class='glossary-word' data-word='generators'>generators</span> can make this colourful picture! They learn from millions of pictures. When you type a written instruction, called a <span class='glossary-word' data-word='prompt'>prompt</span>, AI creates a matching image.",
+      "People use AI pictures for stories and video games. Even <span class='glossary-word' data-word='imaginary'>imaginary</span> scenes can look very <span class='glossary-word' data-word='realistic'>realistic</span>. However, AI pictures sometimes have strange mistakes, like hands with the wrong number of fingers.",
+      "Can AI really be an artist? AI can make fast pictures, but human artists put their own feelings and life experiences into their art."
+    ],
+    glossary: {
+      generators: "Computer programs that create new things.",
+      prompt: "A written instruction given to an AI computer.",
+      imaginary: "Made up in your mind; not real.",
+      realistic: "Looking very real, like a photo."
+    },
+    questions: [
+      {
+        skill: "Reading Check",
+        q: "What do we call a written instruction given to an AI image generator?",
+        options: [
+          "A brush",
+          "A prompt",
+          "A camera",
+          "A game"
+        ],
+        correct: 1
+      },
+      {
+        skill: "Reading Check",
+        q: "How do AI image generators learn to make pictures?",
+        options: [
+          "By studying millions of pictures",
+          "By going to primary school",
+          "By watching dragons on the moon",
+          "By buying paint at an art shop"
+        ],
+        correct: 0
+      },
+      {
+        skill: "Reading Check",
+        q: "What strange mistake do AI pictures sometimes have?",
+        options: [
+          "They only use black and white colours.",
+          "Hands with the wrong number of fingers.",
+          "The pictures disappear after five seconds.",
+          "They cannot draw animals."
+        ],
+        correct: 1
+      },
+      {
+        skill: "Reading Check",
+        q: "According to the article, what do human artists put into their art that AI does not have?",
+        options: [
+          "Fast computer chips",
+          "Written prompts",
+          "Their own feelings and experiences",
+          "Extra fingers"
+        ],
+        correct: 2
+      }
+    ]
+  }
+];
+
+// ============================================================================
+// STATE MANAGEMENT
+// ============================================================================
+let currentArticleIdx = 0;
+// Current question index (0..3) per article
+const currentQuestionIndices = [0, 0, 0, 0, 0];
+// Selected options per article: 5 arrays of [null | 0..3]
+const userAnswers = articles.map(() => [null, null, null, null]);
+// Track whether each story's quiz has been submitted
+const storySubmitted = [false, false, false, false, false];
+const letters = ["A", "B", "C", "D"];
+
+// ============================================================================
+// FLEXIBLE DEVICE VIEWPORT MODE CONTROLLER (Auto / Phone / Tablet Portrait / Tablet Split)
+// ============================================================================
+let currentViewportMode = "auto"; // 'auto' | 'phone' | 'tablet-portrait' | 'tablet-landscape'
+
+function resolveAutoView() {
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+  if (w >= 920 || (w >= 760 && w > h * 1.15)) {
+    return "tablet-landscape";
+  } else if (w >= 600) {
+    return "tablet-portrait";
+  }
+  return "phone";
+}
+
+function setViewportMode(mode) {
+  currentViewportMode = mode;
+  applyViewportLayout();
+}
+
+function applyViewportLayout() {
+  const appFrame = document.getElementById("appFrame");
+  const effectiveView = currentViewportMode === "auto" ? resolveAutoView() : currentViewportMode;
+  appFrame.setAttribute("data-view", effectiveView);
+
+  // Update active button styling in the toolbar
+  const modes = ["auto", "phone", "tablet-portrait", "tablet-landscape"];
+  modes.forEach(m => {
+    const btn = document.getElementById(`modeBtn-${m}`);
+    if (!btn) return;
+    if (m === currentViewportMode) {
+      btn.className = "mode-btn px-2 py-0.5 rounded-full font-bold text-[10.5px] transition flex items-center gap-1 bg-sky-600 text-white shadow-xs";
+    } else {
+      btn.className = "mode-btn px-2 py-0.5 rounded-full font-bold text-[10.5px] transition flex items-center gap-1 text-slate-300 hover:bg-slate-700/70";
+    }
+  });
+
+  // Update human-readable status label
+  const labelMap = {
+    "phone": "Phone (Compact)",
+    "tablet-portrait": "Tablet Portrait",
+    "tablet-landscape": "Tablet Split-View"
+  };
+  const activeLabel = document.getElementById("activeSizeLabel");
+  if (activeLabel) {
+    activeLabel.textContent = currentViewportMode === "auto"
+      ? `Auto • ${labelMap[effectiveView]}`
+      : labelMap[effectiveView];
+  }
+}
+
+window.addEventListener("resize", () => {
+  if (currentViewportMode === "auto") {
+    applyViewportLayout();
+  }
+});
+
+// ============================================================================
+// RENDER FUNCTIONS
+// ============================================================================
+function renderAll(articleAnim = "fade", questionAnim = "fade") {
+  applyStoryTheme();
+  renderTopNavigation();
+  renderArticle(articleAnim);
+  renderBottomSection(questionAnim);
+}
+
+function applyStoryTheme() {
+  const t = articles[currentArticleIdx].theme;
+  const topHalf = document.getElementById("topHalf");
+  const bottomHalf = document.getElementById("bottomHalf");
+  const topHeader = document.getElementById("topHeader");
+  const categoryBadge = document.getElementById("articleCategory");
+  const emojiBox = document.getElementById("articleEmoji");
+  const glossaryBar = document.getElementById("glossaryBar");
+  const glossaryBadge = document.getElementById("glossaryBadge");
+  const swipeHint = document.getElementById("storySwipeHint");
+
+  topHalf.style.backgroundColor = t.topBg;
+  topHalf.style.borderColor = t.borderColor;
+  bottomHalf.style.backgroundColor = t.bottomBg;
+  topHeader.style.background = t.headerGrad;
+
+  categoryBadge.style.backgroundColor = t.badgeBg;
+  categoryBadge.style.color = t.badgeText;
+  categoryBadge.style.borderColor = t.borderColor;
+  swipeHint.style.color = t.badgeText;
+  emojiBox.style.borderColor = t.borderColor;
+  glossaryBar.style.borderColor = t.borderColor;
+  glossaryBadge.style.backgroundColor = t.accentHex;
+}
+
+function renderTopNavigation() {
+  const dotsContainer = document.getElementById("articleDots");
+  dotsContainer.innerHTML = "";
+  articles.forEach((art, idx) => {
+    const isSubmitted = storySubmitted[idx];
+    const dot = document.createElement("button");
+    dot.setAttribute("aria-label", `Go to Story ${idx + 1}`);
+    dot.onclick = () => jumpToArticle(idx);
+
+    if (idx === currentArticleIdx) {
+      dot.className = "w-5 h-2 rounded-full bg-white transition-all shadow-xs";
+    } else if (isSubmitted) {
+      dot.className = "w-2 h-2 rounded-full bg-emerald-300 hover:bg-white transition-all";
+    } else {
+      dot.className = "w-2 h-2 rounded-full bg-white/45 hover:bg-white/75 transition-all";
+    }
+    dotsContainer.appendChild(dot);
+  });
+}
+
+function renderArticle(direction) {
+  const art = articles[currentArticleIdx];
+  const t = art.theme;
+  const container = document.getElementById("articleContainer");
+  container.classList.remove("anim-left", "anim-right", "anim-fade");
+  void container.offsetWidth;
+  container.classList.add(
+    direction === "next" ? "anim-right" : direction === "prev" ? "anim-left" : "anim-fade"
+  );
+
+  document.getElementById("articleCategory").textContent = art.category;
+  document.getElementById("articleEmoji").textContent = art.emoji;
+  document.getElementById("articleTitle").textContent = art.title;
+  document.getElementById("articleByline").textContent = art.byline;
+
+  const textEl = document.getElementById("articleText");
+  textEl.innerHTML = art.paragraphs.map(p => `<p>${p}</p>`).join("");
+
+  const glossaryContent = document.getElementById("glossaryContent");
+  glossaryContent.innerHTML = `Tap any <span style="color:${t.wordColor}" class="font-bold underline decoration-dashed">highlighted word</span> above for its meaning!`;
+
+  const wordSpans = textEl.querySelectorAll(".glossary-word");
+  wordSpans.forEach(span => {
+    span.style.color = t.wordColor;
+    span.addEventListener("click", (e) => {
+      e.stopPropagation();
+      wordSpans.forEach(s => s.classList.remove("active-word"));
+      span.classList.add("active-word");
+      const key = span.getAttribute("data-word");
+      const meaning = art.glossary[key];
+      if (meaning) {
+        glossaryContent.innerHTML = `<strong style="color:${t.wordColor}" class="uppercase text-[10px] mr-1">${key}:</strong> ${meaning}`;
+      }
+    });
+  });
+}
+
+function renderBottomSection(questionAnim = "fade") {
+  const art = articles[currentArticleIdx];
+  const t = art.theme;
+  const qIdx = currentQuestionIndices[currentArticleIdx];
+  const qObj = art.questions[qIdx];
+  const answers = userAnswers[currentArticleIdx];
+  const isSubmitted = storySubmitted[currentArticleIdx];
+
+  // Animate Question Area when swiping between Q1-Q4
+  const swipeArea = document.getElementById("questionSwipeArea");
+  swipeArea.classList.remove("anim-left", "anim-right", "anim-fade");
+  void swipeArea.offsetWidth;
+  swipeArea.classList.add(
+    questionAnim === "next" ? "anim-right" : questionAnim === "prev" ? "anim-left" : "anim-fade"
+  );
+
+  // 1. Render Q1 - Q4 Tabs
+  const tabsContainer = document.getElementById("questionTabs");
+  tabsContainer.innerHTML = "";
+  for (let i = 0; i < 4; i++) {
+    const btn = document.createElement("button");
+    btn.onclick = () => jumpToQuestion(i);
+    const isCurrent = i === qIdx;
+    const hasAns = answers[i] !== null;
+
+    let statusIcon = "";
+    let baseClasses = "q-tab-btn px-1.5 py-0.5 rounded-md text-[10.5px] font-extrabold transition-all flex items-center gap-0.5 border ";
+
+    if (isSubmitted) {
+      const isCorrect = answers[i] === art.questions[i].correct;
+      statusIcon = isCorrect ? "✓" : "✕";
+      if (isCurrent) {
+        baseClasses += isCorrect
+          ? "bg-emerald-600 text-white border-emerald-700 shadow-xs"
+          : "bg-rose-600 text-white border-rose-700 shadow-xs";
+      } else {
+        baseClasses += isCorrect
+          ? "bg-emerald-100 text-emerald-800 border-emerald-300 opacity-85"
+          : "bg-rose-100 text-rose-800 border-rose-300 opacity-85";
+      }
+    } else {
+      if (isCurrent) {
+        baseClasses += "text-white shadow-xs";
+        btn.style.backgroundColor = t.accentHex;
+        btn.style.borderColor = t.accentHex;
+      } else if (hasAns) {
+        baseClasses += "bg-white text-slate-800 border-slate-300";
+        statusIcon = "•";
+      } else {
+        baseClasses += "bg-white/60 text-slate-500 border-slate-200/80";
+      }
+    }
+
+    btn.className = baseClasses;
+    btn.innerHTML = `<span>Q${i + 1}</span>${statusIcon ? `<span class="text-[9.5px]">${statusIcon}</span>` : ""}`;
+    tabsContainer.appendChild(btn);
+  }
+
+  // 2. Skill Tag & All-4 Summary Button
+  const skillTag = document.getElementById("questionSkillTag");
+  const summaryBtn = document.getElementById("summaryToggleBtn");
+
+  if (isSubmitted) {
+    const score = answers.reduce((acc, ans, idx) => acc + (ans === art.questions[idx].correct ? 1 : 0), 0);
+    skillTag.textContent = `Score: ${score}/4`;
+    skillTag.style.backgroundColor = score >= 3 ? "#d1fae5" : "#fef3c7";
+    skillTag.style.color = score >= 3 ? "#065f46" : "#92400e";
+    skillTag.style.borderColor = score >= 3 ? "#6ee7b7" : "#fde68a";
+    summaryBtn.classList.remove("hidden");
+  } else {
+    skillTag.textContent = qObj.skill;
+    skillTag.style.backgroundColor = t.badgeBg;
+    skillTag.style.color = t.badgeText;
+    skillTag.style.borderColor = t.borderColor;
+    summaryBtn.classList.add("hidden");
+    toggleSummaryModal(false);
+  }
+
+  // 3. Question Prompt
+  document.getElementById("questionText").textContent = `${qIdx + 1}. ${qObj.q}`;
+
+  // 4. Render Options
+  const optionsList = document.getElementById("optionsList");
+  optionsList.innerHTML = "";
+  qObj.options.forEach((optText, optIdx) => {
+    const isSelected = answers[qIdx] === optIdx;
+    const isCorrectOption = qObj.correct === optIdx;
+    const btn = document.createElement("button");
+    let btnClasses = "option-btn w-full text-left px-2.5 py-1 rounded-lg border text-[11.5px] leading-[1.25] font-medium flex items-center justify-between gap-1.5 transition-all ";
+    let badgeClasses = "option-badge w-4 h-4 rounded text-[10px] font-extrabold flex items-center justify-center shrink-0 ";
+    let rightTag = "";
+
+    if (!isSubmitted) {
+      btn.onclick = () => selectOption(optIdx);
+      if (isSelected) {
+        btnClasses += "text-white shadow-xs font-semibold active:scale-[0.99]";
+        btn.style.backgroundColor = t.accentHex;
+        btn.style.borderColor = t.accentHex;
+        badgeClasses += "bg-white text-slate-900";
+        rightTag = `<span class="text-[9px] font-bold bg-white/25 px-1 py-0.5 rounded shrink-0">✓</span>`;
+      } else {
+        btnClasses += "bg-white/90 text-slate-700 border-slate-200/90 hover:bg-white active:scale-[0.99]";
+        badgeClasses += "bg-slate-100 text-slate-600";
+      }
+    } else {
+      // Post-submission: Lock selection and reveal Correct (Green) & Wrong Selection (Red)
+      btn.disabled = true;
+      if (isCorrectOption) {
+        btnClasses += "bg-emerald-50 text-emerald-950 border-emerald-500 font-bold ring-1 ring-emerald-400";
+        badgeClasses += "bg-emerald-600 text-white";
+        rightTag = `<span class="text-[9px] font-extrabold text-emerald-700 bg-emerald-100 px-1 py-0.5 rounded shrink-0">${isSelected ? "✓ Yours" : "✓ Answer"}</span>`;
+      } else if (isSelected && !isCorrectOption) {
+        btnClasses += "bg-rose-50 text-rose-900 border-rose-400 font-semibold";
+        badgeClasses += "bg-rose-600 text-white";
+        rightTag = `<span class="text-[9px] font-extrabold text-rose-700 bg-rose-100 px-1 py-0.5 rounded shrink-0">✕ Yours</span>`;
+      } else {
+        btnClasses += "bg-white/50 text-slate-400 border-slate-200/60 opacity-75";
+        badgeClasses += "bg-slate-100 text-slate-400";
+      }
+    }
+
+    btn.className = btnClasses;
+    btn.innerHTML = `
+      <div class="flex items-center gap-1.5 min-w-0 flex-1">
+        <span class="${badgeClasses}">${letters[optIdx]}</span>
+        <span class="leading-tight break-words">${optText}</span>
+      </div>
+      ${rightTag}
+    `;
+    optionsList.appendChild(btn);
+  });
+
+  // 5. Bottom Prev Q / Next Q & Submit Button State
+  document.getElementById("prevQBtn").disabled = qIdx === 0;
+  document.getElementById("nextQBtn").disabled = qIdx === 3;
+
+  const answeredCount = answers.filter(a => a !== null).length;
+  const submitBtn = document.getElementById("submitQuizBtn");
+
+  if (!isSubmitted) {
+    if (answeredCount === 4) {
+      submitBtn.disabled = false;
+      submitBtn.style.backgroundColor = t.accentHex;
+      submitBtn.style.borderColor = t.accentHex;
+      submitBtn.className = "w-full py-1 px-2.5 rounded-lg font-extrabold text-[11px] text-white shadow-xs transition-all flex items-center justify-center gap-1 active:scale-95 cursor-pointer";
+      submitBtn.innerHTML = `<span>Submit Answers (4/4)</span><span>✓</span>`;
+    } else {
+      submitBtn.disabled = true;
+      submitBtn.style.backgroundColor = "";
+      submitBtn.style.borderColor = "";
+      submitBtn.className = "w-full py-1 px-2.5 rounded-lg font-bold text-[10.5px] transition-all flex items-center justify-center gap-1 bg-white/70 text-slate-400 border border-slate-300/70";
+      submitBtn.innerHTML = `<span>Answer all 4 (${answeredCount}/4)</span>`;
+    }
+  } else {
+    // Already submitted: button acts as "View Summary Key"
+    submitBtn.disabled = false;
+    submitBtn.style.backgroundColor = "#1e293b";
+    submitBtn.style.borderColor = "#1e293b";
+    submitBtn.className = "w-full py-1 px-2.5 rounded-lg font-extrabold text-[10.5px] text-white shadow-xs transition-all flex items-center justify-center gap-1 active:scale-95";
+    submitBtn.innerHTML = `<span>View All 4 Answers</span>`;
+  }
+}
+
+// ============================================================================
+// INTERACTION HANDLERS
+// ============================================================================
+function selectOption(optIdx) {
+  if (storySubmitted[currentArticleIdx]) return;
+  const qIdx = currentQuestionIndices[currentArticleIdx];
+  userAnswers[currentArticleIdx][qIdx] = optIdx;
+  renderBottomSection("fade");
+}
+
+function changeQuestion(delta) {
+  const curQ = currentQuestionIndices[currentArticleIdx];
+  const nextQ = curQ + delta;
+  if (nextQ >= 0 && nextQ < 4) {
+    currentQuestionIndices[currentArticleIdx] = nextQ;
+    renderBottomSection(delta > 0 ? "next" : "prev");
+  }
+}
+
+function jumpToQuestion(idx) {
+  const curQ = currentQuestionIndices[currentArticleIdx];
+  if (idx === curQ) {
+    toggleSummaryModal(false);
+    return;
+  }
+  const dir = idx > curQ ? "next" : "prev";
+  currentQuestionIndices[currentArticleIdx] = idx;
+  toggleSummaryModal(false);
+  renderBottomSection(dir);
+}
+
+function submitCurrentStory() {
+  const answers = userAnswers[currentArticleIdx];
+  if (!storySubmitted[currentArticleIdx]) {
+    if (answers.some(a => a === null)) return;
+    storySubmitted[currentArticleIdx] = true;
+    renderTopNavigation();
+    renderBottomSection("fade");
+    populateSummaryOverlay();
+    toggleSummaryModal(true);
+  } else {
+    populateSummaryOverlay();
+    toggleSummaryModal();
+  }
+}
+
+function populateSummaryOverlay() {
+  const art = articles[currentArticleIdx];
+  const answers = userAnswers[currentArticleIdx];
+  let score = 0;
+  answers.forEach((a, i) => {
+    if (a === art.questions[i].correct) score++;
+  });
+
+  document.getElementById("overlayScoreTitle").textContent = `${art.title} • Score: ${score}/4`;
+  const list = document.getElementById("overlayList");
+  list.innerHTML = "";
+
+  art.questions.forEach((qObj, idx) => {
+    const uAns = answers[idx];
+    const cAns = qObj.correct;
+    const isCorrect = uAns === cAns;
+    const row = document.createElement("button");
+    row.onclick = () => jumpToQuestion(idx);
+    row.className = `w-full text-left px-2 py-1 rounded-lg border text-[10.5px] flex items-center justify-between gap-1.5 transition ${
+      isCorrect ? "bg-emerald-50/90 border-emerald-300" : "bg-rose-50/90 border-rose-300"
+    }`;
+    row.innerHTML = `
+      <div class="min-w-0 flex-1">
+        <div class="font-bold text-slate-800 truncate">Q${idx + 1}: ${qObj.q}</div>
+        <div class="truncate mt-0.5">
+          <span class="${isCorrect ? "text-emerald-700 font-bold" : "text-rose-700 font-semibold"}">
+            You: ${letters[uAns]}) ${qObj.options[uAns]}
+          </span>
+          ${!isCorrect ? `<span class="text-emerald-800 font-extrabold ml-1">• Ans: ${letters[cAns]}) ${qObj.options[cAns]}</span>` : ""}
+        </div>
+      </div>
+      <span class="text-xs font-extrabold shrink-0 ${isCorrect ? "text-emerald-700" : "text-rose-700"}">${isCorrect ? "✓" : "✕"}</span>
+    `;
+    list.appendChild(row);
+  });
+}
+
+function toggleSummaryModal(forceState) {
+  const overlay = document.getElementById("summaryOverlay");
+  const isHidden = overlay.classList.contains("hidden");
+  const nextState = typeof forceState === "boolean" ? forceState : isHidden;
+
+  if (nextState && storySubmitted[currentArticleIdx]) {
+    populateSummaryOverlay();
+    overlay.classList.remove("hidden");
+    overlay.classList.add("flex");
+  } else {
+    overlay.classList.add("hidden");
+    overlay.classList.remove("flex");
+  }
+}
+
+function retryArticle() {
+  userAnswers[currentArticleIdx] = [null, null, null, null];
+  storySubmitted[currentArticleIdx] = false;
+  currentQuestionIndices[currentArticleIdx] = 0;
+  toggleSummaryModal(false);
+  renderAll("fade", "fade");
+}
+
+// ============================================================================
+// ZONE-AWARE SWIPE GESTURES:
+// - Swiping Left/Right on TOP HALF switches between the 5 Stories
+// - Swiping Left/Right on BOTTOM HALF moves back and forth between Q1 - Q4
+// ============================================================================
+function changeArticle(delta) {
+  const nextIdx = (currentArticleIdx + delta + articles.length) % articles.length;
+  currentArticleIdx = nextIdx;
+  toggleSummaryModal(false);
+  renderAll(delta > 0 ? "next" : "prev", "fade");
+}
+
+function jumpToArticle(idx) {
+  if (idx === currentArticleIdx) return;
+  const dir = idx > currentArticleIdx ? "next" : "prev";
+  currentArticleIdx = idx;
+  toggleSummaryModal(false);
+  renderAll(dir, "fade");
+}
+
+function attachHorizontalSwipe(element, onSwipeLeft, onSwipeRight) {
+  let startX = 0;
+  let startY = 0;
+  let dragging = false;
+
+  element.addEventListener("touchstart", (e) => {
+    if (e.touches.length === 1) {
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+    }
+  }, { passive: true });
+
+  element.addEventListener("touchend", (e) => {
+    if (e.changedTouches.length === 1) {
+      const dx = e.changedTouches[0].clientX - startX;
+      const dy = e.changedTouches[0].clientY - startY;
+      // Only trigger horizontal swipe when horizontal gesture is significantly greater than vertical scroll
+      if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.8) {
+        if (dx < 0) onSwipeLeft();
+        else onSwipeRight();
+      }
+    }
+  }, { passive: true });
+
+  element.addEventListener("mousedown", (e) => {
+    startX = e.clientX;
+    startY = e.clientY;
+    dragging = true;
+  });
+
+  element.addEventListener("mouseup", (e) => {
+    if (!dragging) return;
+    dragging = false;
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+    if (Math.abs(dx) > 55 && Math.abs(dx) > Math.abs(dy) * 1.3) {
+      if (dx < 0) onSwipeLeft();
+      else onSwipeRight();
+    }
+  });
+}
+
+// Bind Top Half to Story Swiping & Bottom Half to Question Swiping
+const topHalfEl = document.getElementById("topHalf");
+const bottomHalfEl = document.getElementById("bottomHalf");
+
+attachHorizontalSwipe(
+  topHalfEl,
+  () => changeArticle(1),  // Swipe Left on Top Half -> Next Story
+  () => changeArticle(-1)  // Swipe Right on Top Half -> Prev Story
+);
+
+attachHorizontalSwipe(
+  bottomHalfEl,
+  () => changeQuestion(1),  // Swipe Left on Bottom Half -> Next Question (Q1->Q2->Q3->Q4)
+  () => changeQuestion(-1)  // Swipe Right on Bottom Half -> Prev Question (Q4->Q3->Q2->Q1)
+);
+
+// Initialize App on Load
+window.onload = () => {
+  applyViewportLayout();
+  renderAll("fade", "fade");
+};
+</script>
+</body>
+</html>
